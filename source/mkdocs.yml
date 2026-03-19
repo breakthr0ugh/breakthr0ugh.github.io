@@ -1,1 +1,17 @@
-site_name: My Docs
+site_name: Портфолио с лабораторными работами
+
+theme:
+  name: material
+  language: ru
+  palette:
+    scheme: slate
+    primary: purple
+    accent: cyan
+
+nav:
+  - Главная: index.md
+  - Об авторе: about.md
+  - Лабораторные работы:
+      - Лабораторная работа 1: labs/lab1.md
+      - Лабораторная работа 2: labs/lab2.md
+      - Лабораторная работа 3: labs/lab3.md
