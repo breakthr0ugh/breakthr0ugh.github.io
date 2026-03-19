@@ -6,7 +6,12 @@ theme:
   palette:
     scheme: slate
     primary: purple
-    accent: cyan
+    accent: deep purple
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - search.suggest
 
 nav:
   - Главная: index.md
@@ -15,3 +20,10 @@ nav:
       - Лабораторная работа 1: labs/lab1.md
       - Лабораторная работа 2: labs/lab2.md
       - Лабораторная работа 3: labs/lab3.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
