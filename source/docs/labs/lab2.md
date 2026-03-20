@@ -380,11 +380,12 @@ def plot_histogram(data: np.ndarray) -> None:
     os.makedirs("plots", exist_ok=True)
 
     plt.figure(figsize=(8, 5))
-    plt.hist(data, bins=10, edgecolor="black")
-    plt.title("Histogram of Math Scores")
-    plt.xlabel("Score")
-    plt.ylabel("Frequency")
-    plt.grid(axis="y", linestyle="--", alpha=0.7)
+    plt.hist(data, bins=10, color="#b26ad6", edgecolor="black", label="Математика")
+    plt.title("Распределение оценок по математике")
+    plt.xlabel("Балл")
+    plt.ylabel("Количество работ")
+    plt.grid(axis="y", linestyle="--", alpha=0.5)
+    plt.legend(title="Легенда:")
     plt.savefig("plots/histogram.png")
     plt.close()
 ```
@@ -403,8 +404,14 @@ def plot_heatmap(matrix: np.ndarray) -> None:
     os.makedirs("plots", exist_ok=True)
 
     plt.figure(figsize=(6, 5))
-    sns.heatmap(matrix, annot=True, cmap="coolwarm", linewidths=0.5)
-    plt.title("Heatmap")
+    sns.heatmap(
+        matrix,
+        annot=True,
+        cmap="plasma",
+        linewidths=0.5,
+        cbar_kws={"label": "Коэффициент корреляции"},
+    )
+    plt.title("Тепловая карта корреляции предметов")
     plt.savefig("plots/heatmap.png")
     plt.close()
 ```
@@ -424,11 +431,12 @@ def plot_line(x: np.ndarray, y: np.ndarray) -> None:
     os.makedirs("plots", exist_ok=True)
 
     plt.figure(figsize=(8, 5))
-    plt.plot(x, y, marker="o")
-    plt.title("Student Scores in Math")
-    plt.xlabel("Student")
-    plt.ylabel("Score")
+    plt.plot(x, y, marker="o", linestyle="--", color="#b26ad6", label="Математика")
+    plt.title("График зависимости: студент/оценка по математике")
+    plt.xlabel("Студент")
+    plt.ylabel("Балл")
     plt.grid(True, linestyle="--", alpha=0.7)
+    plt.legend(title="Легенда:")
     plt.savefig("plots/line.png")
     plt.close()
 ```
