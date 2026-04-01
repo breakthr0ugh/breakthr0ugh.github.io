@@ -1,22 +1,3 @@
-on:
-  push:
-    - workflows: [build-and-deploy-site]
-      filter:
-        branches: ["main"]
-
-workflows:
-  build-and-deploy-site:
-    tasks:
-      - name: build-and-publish
-        cubes:
-          - name: build-mkdocs
-            image: docker.io/library/python:3.12
-            script:
-              - |
-                python -m pip install --upgrade pip
-                pip install mkdocs mkdocs-material
-                mkdocs build -f source/mkdocs.yml -d site
-
           - name: publish-release-branch
             image: docker.io/library/python:3.12
             env:
@@ -31,13 +12,16 @@ workflows:
                 git config --global user.name "SourceCraft CI"
                 git config --global user.email "ci@sourcecraft.local"
 
-                AUTH_HEADER="$(printf 'git:%s' "$SC_TOKEN" | base64 | tr -d '\n')"
+                cat > ~/.netrc <<EOF
+                machine git.sourcecraft.dev
+                login kiuyqu
+                password ${SC_TOKEN}
+                EOF
+                chmod 600 ~/.netrc
 
-                git -c http.extraHeader="Authorization: Basic $AUTH_HEADER" \
-                  clone https://git.sourcecraft.dev/kiuyqu/site-1.git deploy_repo
+                git clone https://git.sourcecraft.dev/kiuyqu/site-1.git deploy_repo
 
                 cd deploy_repo
-
                 git fetch origin || true
                 git checkout release || git checkout --orphan release
 
@@ -48,6 +32,4 @@ workflows:
 
                 git add .
                 git commit -m "Deploy site from main" || echo "No changes to commit"
-
-                git -c http.extraHeader="Authorization: Basic $AUTH_HEADER" \
-                  push origin release
+                git push origin release
