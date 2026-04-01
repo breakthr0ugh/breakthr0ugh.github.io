@@ -24,7 +24,8 @@ workflows:
               - apt-get update && apt-get install -y git rsync
               - git config --global user.name "SourceCraft CI"
               - git config --global user.email "ci@sourcecraft.local"
-              - git clone "https://kiuyqu:${SC_TOKEN}@git.sourcecraft.dev/kiuyqu/site-1.git" deploy_repo
+              - AUTH_HEADER=$(printf 'kiuyqu:%s' "$SC_TOKEN" | base64 | tr -d '\n')
+              - git -c http.extraHeader="Authorization: Basic $AUTH_HEADER" clone https://git.sourcecraft.dev/kiuyqu/site-1.git deploy_repo
               - cd deploy_repo
               - git checkout release || git checkout --orphan release
               - find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
@@ -34,4 +35,4 @@ workflows:
               - cd deploy_repo
               - git add .
               - git commit -m "Deploy site from main" || echo "No changes to commit"
-              - git push origin release
+              - git -c http.extraHeader="Authorization: Basic $AUTH_HEADER" push origin release
