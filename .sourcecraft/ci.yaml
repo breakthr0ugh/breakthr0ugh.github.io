@@ -1,7 +1,24 @@
+on:
+  push:
+    - workflows: [build-and-deploy-site]
+      filter:
+        branches: ["main"]
+
+workflows:
+  build-and-deploy-site:
+    tasks:
+      - name: build-and-publish
+        cubes:
+          - name: build-mkdocs
+            image: docker.io/library/python:3.12
+            script:
+              - |
+                python -m pip install --upgrade pip
+                pip install mkdocs mkdocs-material
+                mkdocs build -f source/mkdocs.yml -d site
+
           - name: publish-release-branch
             image: docker.io/library/python:3.12
-            env:
-              SC_TOKEN: ${{ secrets.SC_TOKEN }}
             script:
               - |
                 set -e
@@ -12,24 +29,26 @@
                 git config --global user.name "SourceCraft CI"
                 git config --global user.email "ci@sourcecraft.local"
 
-                cat > ~/.netrc <<EOF
-                machine git.sourcecraft.dev
-                login kiuyqu
-                password ${SC_TOKEN}
-                EOF
-                chmod 600 ~/.netrc
-
-                git clone https://git.sourcecraft.dev/kiuyqu/site-1.git deploy_repo
-
-                cd deploy_repo
+                rm -rf .release-worktree
                 git fetch origin || true
-                git checkout release || git checkout --orphan release
 
+                if git show-ref --verify --quiet refs/remotes/origin/release; then
+                  git worktree add .release-worktree origin/release
+                else
+                  git worktree add --detach .release-worktree
+                  cd .release-worktree
+                  git checkout --orphan release
+                  cd ..
+                fi
+
+                cd .release-worktree
                 find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-
                 mkdir -p site
                 rsync -a ../site/ ./site/
 
                 git add .
                 git commit -m "Deploy site from main" || echo "No changes to commit"
-                git push origin release
+                git push origin HEAD:release
+
+                cd ..
+                git worktree remove .release-worktree --force
