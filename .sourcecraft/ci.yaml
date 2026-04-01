@@ -9,15 +9,7 @@ workflows:
     tasks:
       - name: build-and-publish
         cubes:
-          - name: build-mkdocs
-            image: docker.io/library/python:3.12
-            script:
-              - |
-                python -m pip install --upgrade pip
-                pip install mkdocs mkdocs-material
-                mkdocs build -f source/mkdocs.yml -d site
-
-          - name: publish-release-branch
+          - name: build-and-publish-site
             image: docker.io/library/python:3.12
             script:
               - |
@@ -26,8 +18,13 @@ workflows:
                 apt-get update
                 apt-get install -y git rsync
 
+                python -m pip install --upgrade pip
+                pip install mkdocs mkdocs-material
+
                 git config --global user.name "SourceCraft CI"
                 git config --global user.email "ci@sourcecraft.local"
+
+                mkdocs build -f source/mkdocs.yml -d site
 
                 rm -rf .release-worktree
                 git fetch origin || true
